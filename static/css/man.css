@@ -1,0 +1,11 @@
+html,
+body{
+    height: 100%;
+    width: 100%;
+}
+
+.relayer{
+    padding-left: 25%;
+    max-height: 70%;
+    padding-top: 8%;
+}
