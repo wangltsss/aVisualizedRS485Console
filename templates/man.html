@@ -9,7 +9,12 @@
     <meta charset="UTF-8">
     <title>板卡调试系统</title>
 </head>
-<body>
+<body onscroll="SetCookie('scroll', body.scrollTop)" onload="ScrollBack()">
+    <div id="wait_canvas" style="background: rgba(255, 255, 255, 0.8); height: 100%; width: 100%; position: fixed; padding-top: 20%; z-index: 999; overflow: scroll" class="d-flex justify-content-center sec">
+        <div class="spinner-border" role="status" id="canvas-spinner">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <a href="{{ url_for('board') }}">
@@ -18,71 +23,118 @@
             <a class="navbar-brand" href="#">继电器控制面板</a>
             <div class="row">
                 <div class="col-auto">
-                    <button type="button" class="btn btn-outline-light btn-sm" onclick="disconnect_all()">全部断开</button>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <button type="button" class="btn btn-outline-light btn-sm" onclick="cond_select()">选中所有</button>
-                        <label class="form-label" for="pos-select"></label>
-                        <select class="form-select form-select-sm" id="pos-select">
-                            <option selected value="1">通道1</option>
-                            <option value="2">通道2</option>
-                            <option value="3">通道3</option>
-                            <option value="4">通道4</option>
-                        </select>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#edit-group-mode-page">编辑组模式</button>
+                        <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#edit-board-id-page">编辑板卡ID</button>
                     </div>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-outline-success btn-sm" style="margin-right: 10px" onclick="document.getElementById('relayer_panel').submit()">提交</button>
                 </div>
             </div>
         </div>
     </nav>
-    <div class="container-fluid">
-        <form method="post" id="relayer_panel">
-            <table class="table table-striped table-hover" >
-                {% for i in nums %}
-                    {% set outer = loop %}
-                <thead class="table-primary">
-                    <tr>
-                        <th style="text-align: left">
-                            组{{ loop.index }}
-                        </th>
-                        <th>状态</th>
-                        <th>操作</th>
-                     </tr>
-                </thead>
-                <tbody>
-                    {% for j in i %}
-                    <tr>
-                        <th scope="row">通道{{ loop.index }}</th>
-                        {% if j == 1 %}
-                        <td class="text-success">接通</td>
-                        {% elif j == 0 %}
-                        <td class="text-danger">断开</td>
-                        {% endif %}
-                        <td>
-                            <div class="form-check">
-                                <input class="form-check-input tunnl_switch tunnl_switch_{{ loop.index }}" type="radio" name="tunnl_switch_{{ outer.index }}" value={{ "%d%d" | format(outer.index0, loop.index0) }} id="ts_{{ outer.index }}_{{ loop.index }}">
-                                <label class="form-label" for="ts_{{ outer.index }}_{{ loop.index }}">接通</label>
+    <div class="container-fluid mb-5">
+        {% for i in nums %}
+            {% set outer = loop %}
+            <form id="g{{ outer.index }}-form" method="post">
+                <div class="row align-content-center justify-content-center text-center">
+                    <div class="col-auto mt-2 pt-2 pb-2 border-start border-end border-top border-2 border-success">
+                        组{{ outer.index }}
+                    </div>
+                    <div class="row align-content-center justify-content-center text-center">
+                        {% for j in i %}
+                            <div class="col-3 pt-2 pb-2 border border-2 border-success">
+                                {% if j== 1 %}
+                                    <span class="text-success grp{{ outer.index }}" id="g{{ outer.index }}t{{ loop.index }}">通道{{ loop.index }}: 接通</span>
+                                {% elif j == 0 %}
+                                    <span class="text-danger grp{{ outer.index }}" id="g{{ outer.index }}t{{ loop.index }}">通道{{ loop.index }}: 断开</span>
+                                {% endif %}
+                                <div class="form-check">
+                                    <input type="radio" class="btn-check form-check-input" id="g{{ outer.index }}t{{ loop.index }}-submit" value="g{{ outer.index }}t{{ loop.index }}" name="g{{ outer.index }}-tunnel" onclick="submit_cur_form('g{{ outer.index }}-form', 'g{{ outer.index }}t{{ loop.index }}-submit')">
+                                    <label class="btn btn-outline-dark form-check-label" for="g{{ outer.index }}t{{ loop.index }}-submit">开/关</label>
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    <tr>
-                        <th scope="row">通道1～4</th>
-                        <td>N/A</td>
-                        <td>
-                            <div class="form-check">
-                                <input class="form-check-input tunnl_switch tunnl_switch_none" type="radio" name="tunnl_switch_{{ outer.index }}" value="{{ '%d' | format(outer.index0) }}n" checked>
-                                <label class="form-label">不接通</label>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                {% endfor %}
-            </table>
-        </form>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
+        {% endfor %}
     </div>
+    <div class="modal fade" id="edit-board-id-page" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">板卡ID变更</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h1 class='display-6'>板卡当前的ID为：{{ bid }}</h1>
+                    <hr>
+                    <form method="post" id="board-id-edit-form">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">板卡ID</span>
+                            <input type="text" class="form-control" placeholder="输入的合法范围为1～100..." id="board-id-edit" name="board-id-edit" required>
+                            <div class="valid-feedback">这个看起来没什么问题:)</div>
+                            <div class="invalid-feedback">输入的合法范围是1～100 换一个数字吧>_<</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-outline-dark" onclick="document.getElementById('board-id-edit-form').submit()">提交变更</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="edit-group-mode-page" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">组模式变更</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if mode | lower == 'e1' %}
+                        <h1 class="display-6">当前的组模式为：4通道</h1>
+                    {% elif mode | lower == 'e2' %}
+                        <h1 class="display-6">当前的组模式为：8通道</h1>
+                    {% elif mode | lower == 'e3' %}
+                        <h1 class="display-6">当前的组模式为：16通道</h1>
+                    {% elif mode | lower == 'e4' %}
+                        <h1 class="display-6">当前的组模式为：32通道</h1>
+                    {% endif %}
+                    <hr>
+                    <form method="post" id="group-mode-edit-form">
+                        <div class="input-group mb-3">
+                            <label class="input-group-text" for="group-mode-edit">组模式</label>
+                            <select class="form-select" id="group-mode-edit" name="group-mode-edit" required>
+                                <option selected disabled>选择组模式...</option>
+                                <option value="E1">4通道</option>
+                                <option value="E2">8通道</option>
+                                <option value="E3">16通道</option>
+                                <option value="E4">32通道</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-outline-dark" onclick="document.getElementById('group-mode-edit-form').submit()">提交变更</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.onload = function (){
+            function setCanvas(){
+                let canvas = document.getElementById("wait_canvas");
+			    canvas.style.zIndex = '-999'
+            }
+            function setDisplay(){
+                let spinner = document.getElementById("canvas-spinner");
+                spinner.style.display = 'none'
+            }
+            setTimeout(() => setCanvas(), 2000)
+            setTimeout(() => setDisplay(), 2000)
+        }
+    </script>
 </body>
 </html>

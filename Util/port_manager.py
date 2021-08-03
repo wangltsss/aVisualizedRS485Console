@@ -49,22 +49,18 @@ class PortManager(object):
                                      stopbits=res["stopbits"])
 
     def send_data(self, value):
-        print("send_data is executed")
         write_data = bytearray.fromhex(value)
-        print(write_data)
-        sleep(0.3)
         try:
+            sleep(0.1)
             self.ser.write(write_data)
-            print(str(write_data) + " has been sent.")
             return True
         except Exception as e:
             print(e)
             return False
 
     def read_data(self):
-        print("read_data is executed")
         try:
-            sleep(0.3)
+            sleep(0.1)
             if self.ser.inWaiting():
                 bs = self.ser.read(self.ser.inWaiting()).hex()
                 res = ''

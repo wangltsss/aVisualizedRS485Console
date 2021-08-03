@@ -2,8 +2,6 @@ from flask import Flask, request, redirect
 
 from Util.subpages import ConfigManager, ErrManager, ManPage, TimeOutManager, to_err
 
-from time import sleep
-
 from functools import wraps
 
 app = Flask(__name__)
@@ -34,11 +32,20 @@ def board():
         ports = manager.get_all_ports()
         return manager.show_page(ports)
 
-    form = manager.get_form()
+    form = {"port": manager.get_form()}
+    manager.connect(form['port'])
     try:
-        return manager.redirect()
-    except Exception as e:
-        print(e)
+        res = manager.consult_metadata()
+        form['id'] = res['id']
+        form['mode'] = res['devGM']
+        form['version'] = res['ver']
+        form['type'] = res['cate']
+        try:
+            return manager.redirect()
+        except Exception as e:
+            print(e)
+            return to_err()
+    except ValueError:
         return to_err()
 
 
@@ -47,7 +54,6 @@ def board():
 def man():
     global form
     lcl_form = form
-    sleep(0.1)
     try:
         manager = ManPage(lcl_form["mode"], lcl_form["id"], lcl_form["type"], lcl_form["version"])
     except NameError:
@@ -56,9 +62,16 @@ def man():
     manager.connect(lcl_form["port"])
 
     if request.method == "GET":
-        return manager.show_page()
+        try:
+            return manager.show_page()
+        except ValueError:
+            return to_err()
 
     manager.alter_tunnl_status()
+    if manager.alter_group_mode():
+        lcl_form['mode'] = manager.mode
+    if manager.alter_board_id():
+        lcl_form['id'] = manager.id
 
     manager.port_man.close(manager.port_man.ser)
     return manager.redirect()
@@ -77,4 +90,4 @@ def time_out():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5555)
+    app.run()
