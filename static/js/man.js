@@ -48,7 +48,14 @@ function ScrollBack() {
     }
 }
 
+function SubmitForm(fid){
+    document.getElementById(fid).submit()
+}
 
+function ChangeBoardSubmit(tid){
+    document.getElementById('change_board_input').value = tid
+    document.getElementById('change-board-form').submit()
+}
 
 
 

@@ -9,3 +9,7 @@ body{
     max-height: 70%;
     padding-top: 8%;
 }
+
+.clickable{
+    cursor: pointer;
+}

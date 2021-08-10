@@ -52,13 +52,22 @@ class ConfigManager(Subpage):
     def get_all_ports(self):
         return self.port_man.list_ports()
 
-    def consult_metadata(self):
-        self.port_man.send_data(self.coder.encode_83())
-        return self.coder.decode_83(self.port_man.read_data())
+    def consult_metadata(self, *bid):
+        if not bid:
+            self.port_man.send_data(self.coder.encode_83())
+            return self.coder.decode_83(self.port_man.read_data())
+        else:
+            self.coder.id = bid[0]
+            self.port_man.send_data(self.coder.encode_84())
+            return self.coder.decode_84(self.port_man.read_data())
 
     def get_form(self):
         port = request.form.get("port-select")
-        return port
+        bid = request.form.get('board-id-input')
+        if bid:
+            return {'port': port, 'id': bid}
+        else:
+            return {'port': port}
 
     def close(self, ser):
         self.port_man.close(ser)
@@ -99,6 +108,7 @@ class ManPage(Subpage):
         self.version = version
         self.coder = CodeParser(self.mode, self.id)
         self.port_man = PortManager()
+        self.conn_alive = []
 
     def update_status(self):
         if self.port_man.send_data(self.coder.encode_85()):
@@ -125,7 +135,11 @@ class ManPage(Subpage):
         except AttributeError:
             self.update_status()
         self.port_man.close(self.port_man.ser)
-        return render_template(self.template, nums=self.status, mode=self.mode, bid=self.id)
+        return render_template(self.template,
+                               nums=self.status,
+                               mode=self.mode,
+                               bid=self.id,
+                               active=self.conn_alive)
 
     def connect(self, port):
         self.port_man.set_port(port)
@@ -195,13 +209,42 @@ class ManPage(Subpage):
         bid = request.form.get("board-id-edit")
         if not bid:
             return False
-        if self.port_man.send_data(self.coder.encode_86(bid)):
+        if self.port_man.send_data(self.coder.encode_86(bid)) and bid not in self.conn_alive:
             self.port_man.read_data()
+            self.conn_alive.remove(int(self.id))
             self.id = bid
             self.coder.id = bid
+            self.conn_alive.append(int(self.id))
             return True
         else:
             return False
+
+    def test_alive(self):
+        for i in range(1, 101):
+            if self.port_man.send_data(self.coder.encode_84(i)):
+                if self.port_man.read_data():
+                    self.conn_alive.append(i)
+        return self.conn_alive
+
+    def change_board_focus(self):
+        tid = request.form.get('change-board-input')
+        if not tid:
+            return False
+        self.id = tid
+        if self.port_man.send_data(self.coder.encode_84()):
+            res = self.coder.decode_84(self.port_man.read_data())
+            self.mode = res['devGM']
+            self.version = res['ver']
+            self.cate = res['cate']
+            return True
+        else:
+            return False
+
+
+
+
+
+
 
 
 

@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 
 form: dict
+conn_alive: list
 
 
 def if_filled_form(f):
@@ -26,17 +27,22 @@ def if_filled_form(f):
 def board():
 
     global form
+    global conn_alive
     manager = ConfigManager()
 
     if request.method == "GET":
         ports = manager.get_all_ports()
         return manager.show_page(ports)
 
-    form = {"port": manager.get_form()}
+    form = manager.get_form()
+    conn_alive = []
     manager.connect(form['port'])
     try:
-        res = manager.consult_metadata()
-        form['id'] = res['id']
+        if 'id' not in form.keys():
+            res = manager.consult_metadata()
+            form['id'] = res['id']
+        else:
+            res = manager.consult_metadata(form['id'])
         form['mode'] = res['devGM']
         form['version'] = res['ver']
         form['type'] = res['cate']
@@ -53,6 +59,7 @@ def board():
 @if_filled_form
 def man():
     global form
+    global conn_alive
     lcl_form = form
     try:
         manager = ManPage(lcl_form["mode"], lcl_form["id"], lcl_form["type"], lcl_form["version"])
@@ -61,6 +68,11 @@ def man():
 
     manager.connect(lcl_form["port"])
 
+    if not conn_alive:
+        conn_alive = manager.test_alive()
+    else:
+        manager.conn_alive = conn_alive
+
     if request.method == "GET":
         try:
             return manager.show_page()
@@ -68,10 +80,15 @@ def man():
             return to_err()
 
     manager.alter_tunnl_status()
+
     if manager.alter_group_mode():
         lcl_form['mode'] = manager.mode
+
     if manager.alter_board_id():
         lcl_form['id'] = manager.id
+
+    if not manager.change_board_focus():
+        manager.change_board_focus()
 
     manager.port_man.close(manager.port_man.ser)
     return manager.redirect()

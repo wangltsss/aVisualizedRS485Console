@@ -22,3 +22,30 @@
 function reload(){
   location.reload()
 }
+
+function testMode(){
+  let val = document.getElementById('test-select').value
+  let board_div = document.getElementById('board-id-div')
+  let id_input = document.getElementById('board-id-input')
+  if (val === 'single'){
+    board_div.style.display = 'none'
+    id_input.required = false
+  }
+  else if (val === 'multiple'){
+    board_div.style.display = ''
+    id_input.required = true
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

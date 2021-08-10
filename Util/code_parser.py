@@ -141,11 +141,17 @@ class CodeParser:
     def decode_83(self, code: str):
         return self.decode_41(code)
 
-    def encode_84(self):
-        return "58 54 {} 84 00 00 00 00 00 00 {}".format(
-            "%02x" % int(self.id),
-            sumCheck(self.id, "84", "00", ["00"] * 5)
-        )
+    def encode_84(self, *bid):
+        try:
+            return "58 54 {} 84 00 00 00 00 00 00 {}".format(
+                "%02x" % bid[0],
+                sumCheck(str(bid[0]), "84", "00", ["00"] * 5)
+            )
+        except IndexError:
+            return "58 54 {} 84 00 00 00 00 00 00 {}".format(
+                "%02x" % int(self.id),
+                sumCheck(self.id, "84", "00", ["00"] * 5)
+            )
 
     def decode_84(self, code: str):
         return self.decode_41(code)
@@ -171,12 +177,6 @@ class CodeParser:
         return self.decode_41(code)
 
     def encode_87(self, devGM):
-        print("encode_87 printed this: encode_87 is executed.")
-        print("encode_87 printed this: the value returned is 58 54 {} 87 {} 00 00 00 00 00 {}".format(
-            "%02x" % int(self.id),
-            devGM,
-            sumCheck(self.id, "87", devGM, ["00"] * 5)
-        ))
         return "58 54 {} 87 {} 00 00 00 00 00 {}".format(
             "%02x" % int(self.id),
             devGM,
@@ -239,8 +239,7 @@ class CodeParser:
             idx = int(status)
             res.append([0 for _ in range(32)])
             if idx:
-                res[0].pop(idx - 1)
-                res[0].insert(idx - 1, 1)
+                res[0][idx - 1] = 1
         return {"id": id, "devGM": devGM, "tunnl_status": res}
 
 

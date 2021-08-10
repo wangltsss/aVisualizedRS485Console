@@ -7,25 +7,56 @@
     <meta charset="UTF-8">
     <title>板卡调试系统</title>
 </head>
-<body class="text-center bg-dark bg-gradient text-white" style="height: 100%">
-    <div class="container-fluid">
+<body style="height: 100%">
+    <div id="wait_canvas" style="background: rgba(255, 255, 255, 0.8); height:100%; width: 100%; position: fixed; padding-top: 20%; z-index: 999; overflow: scroll" class="d-flex justify-content-center">
+        <h1 class="display-6">正在检测该串口下的所有板卡(请等待10秒左右)</h1>
+        <div class="spinner-grow spinners" style="width: 2.6rem; height: 2.6rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow spinners" style="width: 2.6rem; height: 2.6rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow spinners" style="width: 2.6rem; height: 2.6rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow spinners" style="width: 2.6rem; height: 2.6rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div class="container-fluid text-center bg-dark bg-gradient text-white" style="height: 100%">
         <div class="row justify-content-center">
-            <div class="col-4 mt-5 mb-3 p-3 bg-secondary bg-gradient rounded-3 text-start">
+            <div class="col-4 mt-5 p-3 bg-secondary bg-gradient rounded-3 text-start">
                 使用说明：
                 <br>
+
                 <br>
-                - 在'串口选择'选择框选中要连接的串口，然后点击'连接'。
+                - 在'串口选择'选择框选中要连接的串口，并选择待连接板卡的'板卡ID', 然后点击'连接'。
                 <br>
+
                 <br>
-                - 系统会自动识别板卡ID，组模式等参数。
+                - 单块板卡调试时可将板卡ID留空，系统会自动识别板卡ID，组模式等参数。
                 <br>
+
                 <br>
-                - 如'串口选择'列表中没有要连接的串口，则点击'刷新此页'
-                <br>
-                &nbsp;&nbsp; 后再试。
+                - 如'串口选择'列表中没有要连接的串口，则点击'刷新此页'后再试。
             </div>
         </div>
         <form method="post" class="needs-validation" novalidate>
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <div class="input-group mt-5">
+                        <label class="input-group-text bg-dark text-white" for="test-select">
+                            <span style="color: red">*</span>
+                            测试类型
+                        </label>
+                        <select class="form-select bg-secondary text-white" id="test-select" name="test-select" onmouseleave="testMode()" onblur="testMode()">
+                            <option disabled value="">请选择...</option>
+                            <option selected value="single">单板卡测试</option>
+                            <option value="multiple">多板卡级联</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="row justify-content-center">
                 <div class="col-4">
                     <div class="input-group mt-5">
@@ -44,18 +75,58 @@
                     </div>
                 </div>
             </div>
-            <div class="row justify-content-center mt-3" >
+            <div class="row justify-content-center" style="display: none" id="board-id-div">
+                <div class="col-4">
+                    <div class="input-group mt-5">
+                        <span class="input-group-text bg-dark text-white">
+                            <span style="color: red">*</span>
+                            板卡ID
+                        </span>
+                        <input type="text" class="form-control bg-secondary text-white" placeholder="请输入..." id="board-id-input" name="board-id-input">
+                        <div class="valid-feedback">这个看起来没什么问题:)</div>
+                        <div class="invalid-feedback">这项必须填写哦>_<</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3">
                 <div class="col-2">
-                    <button class="btn-outline-danger btn mt-4 w-100" type="submit">连接！</button>
+                    <button class="btn-outline-danger btn mt-4 w-100" type="submit" onclick="setDisplay(); setCanvas()">连接！</button>
                 </div>
             </div>
             <div class="row justify-content-center" >
                 <div class="col-2">
-                    <button class="btn-outline-primary btn w-100 mt-3" type="button" onclick="reload()">刷新此页</button>
+                    <button class="btn-outline-primary btn w-100 mt-3" type="button" onclick="reload(); setDisplay(); setCanvas()">刷新此页</button>
                 </div>
             </div>
         </form>
     </div>
+    <script>
+
+        function UnsetCanvas(){
+            let canvas = document.getElementById("wait_canvas");
+            canvas.style.zIndex = '-999'
+        }
+        function UnsetDisplay(){
+            let spins = document.getElementsByClassName('spinners')
+            for (let i = 0; i < spins.length; i++){
+                spins[i].style.display = 'none'
+            }
+        }
+        function setCanvas(){
+            let canvas = document.getElementById("wait_canvas");
+            canvas.style.zIndex = '999'
+        }
+        function setDisplay(){
+            let spins = document.getElementsByClassName('spinners')
+            for (let i = 0; i < spins.length; i++){
+                spins[i].style.display = 'block'
+            }
+        }
+        window.onload = function (){
+            UnsetCanvas()
+            UnsetDisplay()
+        }
+    </script>
     <script type="text/javascript" src="../static/js/config.js"></script>
 </body>
 </html>
