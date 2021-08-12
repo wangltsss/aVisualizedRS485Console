@@ -18,12 +18,12 @@ def if_filled_form(f):
         try:
             a = form["id"]
         except Exception:
-            return redirect('/board')
+            return redirect('/')
         return f(*args, **kwargs)
     return decorated
 
 
-@app.route('/board/', methods=["POST", "GET"])
+@app.route('/', methods=["POST", "GET"])
 def board():
 
     global form
@@ -35,14 +35,11 @@ def board():
         return manager.show_page(ports)
 
     form = manager.get_form()
-    conn_alive = []
     manager.connect(form['port'])
+    conn_alive = manager.test_alive()
     try:
-        if 'id' not in form.keys():
-            res = manager.consult_metadata()
-            form['id'] = res['id']
-        else:
-            res = manager.consult_metadata(form['id'])
+        form['id'] = conn_alive[0]
+        res = manager.consult_metadata(form['id'])
         form['mode'] = res['devGM']
         form['version'] = res['ver']
         form['type'] = res['cate']

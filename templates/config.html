@@ -45,21 +45,6 @@
             <div class="row justify-content-center">
                 <div class="col-4">
                     <div class="input-group mt-5">
-                        <label class="input-group-text bg-dark text-white" for="test-select">
-                            <span style="color: red">*</span>
-                            测试类型
-                        </label>
-                        <select class="form-select bg-secondary text-white" id="test-select" name="test-select" onmouseleave="testMode()" onblur="testMode()">
-                            <option disabled value="">请选择...</option>
-                            <option selected value="single">单板卡测试</option>
-                            <option value="multiple">多板卡级联</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-4">
-                    <div class="input-group mt-5">
                         <label class="input-group-text bg-dark text-white" for="port-select">
                             <span style="color: red">*</span>
                             串口选择
@@ -72,19 +57,6 @@
                         </select>
                         <div class="valid-feedback">这个看起来没什么问题:)</div>
                         <div class="invalid-feedback">这项必须要选哦>_<</div>
-                    </div>
-                </div>
-            </div>
-            <div class="row justify-content-center" style="display: none" id="board-id-div">
-                <div class="col-4">
-                    <div class="input-group mt-5">
-                        <span class="input-group-text bg-dark text-white">
-                            <span style="color: red">*</span>
-                            板卡ID
-                        </span>
-                        <input type="text" class="form-control bg-secondary text-white" placeholder="请输入..." id="board-id-input" name="board-id-input">
-                        <div class="valid-feedback">这个看起来没什么问题:)</div>
-                        <div class="invalid-feedback">这项必须填写哦>_<</div>
                     </div>
                 </div>
             </div>
@@ -104,20 +76,10 @@
 
         function AutoSet(){
             let port = document.getElementById('port-select')
-            let bid = document.getElementById('board-id-input')
-            if (bid.required){
-                if (port.value && bid.value){
-                    setCanvas()
-                    setDisplay()
-                }
+            if (port.value) {
+                setCanvas()
+                setDisplay()
             }
-            else{
-                if (port.value){
-                    setCanvas()
-                    setDisplay()
-                }
-            }
-
         }
         function UnsetCanvas(){
             let canvas = document.getElementById("wait_canvas");

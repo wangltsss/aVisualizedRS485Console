@@ -38,7 +38,7 @@ class ConfigManager(Subpage):
         super().__init__()
         self.port_man = PortManager()
         self.coder = CodeParser('', '')
-        self.url = "/board"
+        self.url = "/"
         self.template = 'config.html'
 
     def connect(self, port):
@@ -65,14 +65,18 @@ class ConfigManager(Subpage):
 
     def get_form(self):
         port = request.form.get("port-select")
-        bid = request.form.get('board-id-input')
-        if bid:
-            return {'port': port, 'id': bid}
-        else:
-            return {'port': port}
+        return {'port': port}
 
     def close(self, ser):
         self.port_man.close(ser)
+
+    def test_alive(self):
+        res = []
+        for i in range(1, 101):
+            if self.port_man.send_data(self.coder.encode_84(i)):
+                if self.port_man.read_data():
+                    res.append(i)
+        return res
 
 
 class ErrManager(Subpage):
