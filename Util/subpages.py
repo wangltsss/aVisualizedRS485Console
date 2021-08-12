@@ -6,6 +6,8 @@ from Util.code_parser import CodeParser
 
 from time import sleep
 
+from copy import deepcopy
+
 
 def to_err():
     return redirect(url_for('conn_err'))
@@ -182,7 +184,7 @@ class ManPage(Subpage):
 
     def alter_tunnl_status(self):
         self.update_status()
-        before = self.status
+        before = deepcopy(self.status)
         new_ls = self.form_parser(self.get_form())
         if new_ls:
             self.port_man.send_data(self.coder.encode_82(new_ls))

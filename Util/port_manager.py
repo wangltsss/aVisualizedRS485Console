@@ -6,16 +6,10 @@ import platform
 
 from time import sleep
 
-from Util.json_parser import Parser
-
-
-board_conf_path = "conf/board.json"
-
 
 class PortManager(object):
 
     _system = platform.system()
-    _jsonParser = Parser()
 
     ser: serial.Serial
     _serial_port: str
@@ -36,17 +30,16 @@ class PortManager(object):
         return list_ports_name
 
     def create_connection(self, port):
-        res = self._jsonParser.json_reader(board_conf_path)
         if self._system.lower() == "darwin":
             self.ser = serial.Serial(port="/dev/{}".format(port),
-                                     baudrate=res["baudrate"],
-                                     bytesize=res["bytesize"],
-                                     stopbits=res["stopbits"])
+                                     baudrate=115200,
+                                     bytesize=8,
+                                     stopbits=1)
         elif self._system.lower() == "windows":
             self.ser = serial.Serial(port=port,
-                                     baudrate=res["baudrate"],
-                                     bytesize=res["bytesize"],
-                                     stopbits=res["stopbits"])
+                                     baudrate=115200,
+                                     bytesize=8,
+                                     stopbits=1)
 
     def send_data(self, value):
         write_data = bytearray.fromhex(value)
