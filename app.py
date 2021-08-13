@@ -85,7 +85,18 @@ def man():
         lcl_form['id'] = manager.id
 
     if not manager.change_board_focus():
-        manager.change_board_focus()
+        if manager.change_board_focus():
+            form = {'mode': manager.mode,
+                    'id': manager.id,
+                    'type': manager.cate,
+                    'version': manager.version,
+                    'port': lcl_form['port']}
+    else:
+        form = {'mode': manager.mode,
+                'id': manager.id,
+                'type': manager.cate,
+                'version': manager.version,
+                'port': lcl_form['port']}
 
     manager.port_man.close(manager.port_man.ser)
     return manager.redirect()
