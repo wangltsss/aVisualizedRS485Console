@@ -60,6 +60,32 @@
                     </div>
                 </div>
             </div>
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <div class="input-group mt-5">
+                        <span class="input-group-text bg-dark text-white">
+                            <span style="color: red">*</span>
+                            扫描范围下界
+                        </span>
+                        <input type="text" class="form-control bg-secondary text-white" placeholder="默认值为1..." value="1" id="scan-lwr-bounds" name="scan-lwr-bounds">
+                        <div class="valid-feedback">这个看起来没什么问题:)</div>
+                        <div class="invalid-feedback">这项必须填写哦>_<</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <div class="input-group mt-5">
+                        <span class="input-group-text bg-dark text-white">
+                            <span style="color: red">*</span>
+                            扫描范围上界
+                        </span>
+                        <input type="text" class="form-control bg-secondary text-white" placeholder="默认值为100..." value="100" id="scan-upr-bounds" name="scan-upr-bounds">
+                        <div class="valid-feedback">这个看起来没什么问题:)</div>
+                        <div class="invalid-feedback">这项必须填写哦>_<</div>
+                    </div>
+                </div>
+            </div>
             <div class="row justify-content-center mt-3">
                 <div class="col-2">
                     <button class="btn-outline-danger btn mt-4 w-100" type="submit" onclick="AutoSet()">连接！</button>
@@ -76,7 +102,9 @@
 
         function AutoSet(){
             let port = document.getElementById('port-select')
-            if (port.value) {
+            let lwr = document.getElementById('scan-lwr-bounds')
+            let upr = document.getElementById('scan-upr-bounds')
+            if (port.value && lwr.value && upr.value) {
                 setCanvas()
                 setDisplay()
             }

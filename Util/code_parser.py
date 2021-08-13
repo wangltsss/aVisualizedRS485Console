@@ -372,7 +372,7 @@ class CodeParser:
         devGM = code[4:6]
         res = []
         if devGM == "e1":
-            status = code[6:].replace(" ", "")
+            status = code[6:10].replace(" ", "")
             for i in range(len(status)):
                 res.append([0 for _ in range(4)])
                 if int(status[i]):

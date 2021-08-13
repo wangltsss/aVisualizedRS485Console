@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 
 form: dict
-conn_alive: list
+conn_alive: dict
 
 
 def if_filled_form(f):
@@ -36,10 +36,20 @@ def board():
 
     form = manager.get_form()
     manager.connect(form['port'])
-    conn_alive = manager.test_alive()
+    conn_alive = manager.test_alive(request.form.get('scan-lwr-bounds'), request.form.get('scan-upr-bounds'))
     try:
-        form['id'] = conn_alive[0]
-        res = manager.consult_metadata(form['id'])
+        try:
+            form['id'] = conn_alive['sgn'][0]
+            res = manager.consult_metadata(form['id'])
+        except IndexError:
+            try:
+                form['id'] = conn_alive['pwr'][0]
+                res = manager.pw_consult_metadata(form['id'])
+            except IndexError:
+                return to_err()
+            except Exception as e:
+                print(e)
+                return to_err()
         form['mode'] = res['devGM']
         form['version'] = res['ver']
         form['type'] = res['cate']
@@ -65,14 +75,11 @@ def man():
 
     manager.connect(lcl_form["port"])
 
-    if not conn_alive:
-        conn_alive = manager.test_alive()
-    else:
-        manager.conn_alive = conn_alive
+    manager.conn_alive = conn_alive
 
     if request.method == "GET":
         try:
-            return manager.show_page()
+            return manager.show_page
         except ValueError:
             return to_err()
 

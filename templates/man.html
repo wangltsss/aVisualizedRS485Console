@@ -20,7 +20,22 @@
             <a href="{{ url_for('board') }}">
                 <img src="../static/img/box-arrow-left.svg" alt="">
             </a>
-            <a class="navbar-brand" href="#">继电器控制面板</a>
+            <a class="navbar-brand" href="#">
+                当前连接到ID为{{ bid }}的
+                {% if cate | lower == 'f1' %}
+                    功率继电器板
+                {% elif cate | lower == 'f2' %}
+                    信号继电器板
+                {% endif %}
+                组模式为:
+                {% if mode | lower == 'e1' %}
+                    4通道
+                {% elif mode | lower == 'e2' %}
+                    8通道
+                {% elif mode | lower == 'e3' %}
+                    16通道
+                {% endif %}
+            </a>
             <div class="row">
                 <div class="col-auto">
                     <div class="btn-group" role="group">
@@ -72,7 +87,7 @@
                                         {% if j == 1 %}
                                             <label onclick="setCanvas(); setDisplay()" class="btn btn-success form-check-label" for="g{{ i + 2 }}t{{ loop.index }}-submit">接通</label>
                                         {% elif j == 0 %}
-                                            <label onclick="setCanvas(); setDisplay()" class="btn btn-danger form-check-label" for="g{{ i + 2 }}t{{ loop.index }}-submit">闭合</label>
+                                            <label onclick="setCanvas(); setDisplay()" class="btn btn-danger form-check-label" for="g{{ i + 2 }}t{{ loop.index }}-submit">断开</label>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -91,18 +106,23 @@
                         组{{ outer.index }}
                     </div>
                     <div class="row">
-                        {% for p in range(0, i | length, 4) %}
+                    {% if i | length >= 8 %}
+                        {% set step = 4 %}
+                    {% elif i | length < 8 %}
+                        {% set step = 2 %}
+                    {% endif %}
+                        {% for p in range(0, i | length, step) %}
                             <div class="col-6">
                             <div class="row">
-                                {% for j in range(p, p + 4) %}
-                                    <div class="col-3 pt-2 pb-2 border border-2 border-secondary">
+                                {% for j in range(p, p + step) %}
+                                    <div class="col-{{ 12 // step }} pt-2 pb-2 border border-2 border-secondary">
                                         <span class="text-dark grp{{ outer.index }}" id="g{{ outer.index }}t{{ loop.index + p }}">通道{{ loop.index + p }}</span>
                                         <div class="form-check">
                                             <input type="radio" class="btn-check form-check-input" id="g{{ outer.index }}t{{ loop.index + p }}-submit" value="g{{ outer.index }}t{{ loop.index + p }}" name="g{{ outer.index }}-tunnel" onclick="submit_cur_form('g{{ outer.index }}-form', 'g{{ outer.index }}t{{ loop.index + p }}-submit')">
                                             {% if i[j] == 1 %}
                                                 <label onclick="setCanvas(); setDisplay()" class="btn btn-success form-check-label" for="g{{ outer.index }}t{{ loop.index + p }}-submit">接通</label>
                                             {% elif i[j] == 0 %}
-                                                <label onclick="setCanvas(); setDisplay()" class="btn btn-danger form-check-label" for="g{{ outer.index }}t{{ loop.index + p }}-submit">闭合</label>
+                                                <label onclick="setCanvas(); setDisplay()" class="btn btn-danger form-check-label" for="g{{ outer.index }}t{{ loop.index + p }}-submit">断开</label>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -168,7 +188,9 @@
                                 <option value="E1">4通道</option>
                                 <option value="E2">8通道</option>
                                 <option value="E3">16通道</option>
-                                <option value="E4">32通道</option>
+                                {% if self.cate | lower == 'f2' %}
+                                    <option value="E4">32通道</option>
+                                {% endif %}
                             </select>
                         </div>
                     </form>
@@ -187,15 +209,35 @@
         </div>
         <div class="offcanvas-body">
             <div>
-                当前连接到ID为{{ bid }}的板卡
+                当前连接到ID为{{ bid }}的
+                {% if cate | lower == 'f1' %}
+                功率继电器
+                {% elif cate | lower == 'f2' %}
+                信号继电器
+                {% endif %}
+                板卡
             </div>
             <br>
+            <h6>信号继电器板卡：</h6>
             <ul class="list-group">
-                {% for i in range(active | length) %}
-                    {% if active[i] == bid | int %}
-                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active[i] }}'); setDisplay(); setCanvas()">板卡{{ active[i] }}</button>
+                {% for i in range(active_sgn | length) %}
+                    {% if active_sgn[i] == bid | int %}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_sgn[i] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i] }}</button>
                     {% else %}
-                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active[i] }}'); setDisplay(); setCanvas()">板卡{{ active[i] }}</button>
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_sgn[i] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i] }}</button>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <br>
+            <hr>
+            <br>
+            <h6>功率继电器板卡：</h6>
+            <ul class="list-group">
+                {% for i in range(active_pwr | length) %}
+                    {% if active_pwr[i] == bid | int %}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_pwr[i] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i] }}</button>
+                    {% else %}
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_pwr[i] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i] }}</button>
                     {% endif %}
                 {% endfor %}
             </ul>
