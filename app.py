@@ -36,29 +36,35 @@ def board():
 
     form = manager.get_form()
     manager.connect(form['port'])
+    while not manager.check_conn_alive():
+        manager.connect(form['port'])
     conn_alive = manager.test_alive(request.form.get('scan-lwr-bounds'), request.form.get('scan-upr-bounds'))
     try:
         try:
-            form['id'] = conn_alive['sgn'][0]
-            res = manager.consult_metadata(form['id'])
+            form['id'] = conn_alive['sgn'][0]['id']
+            form['mode'] = conn_alive['sgn'][0]['devGM']
+            form['version'] = conn_alive['sgn'][0]['ver']
+            form['type'] = conn_alive['sgn'][0]['cate']
         except IndexError:
             try:
-                form['id'] = conn_alive['pwr'][0]
-                res = manager.pw_consult_metadata(form['id'])
+                form['id'] = conn_alive['pwr'][0]['id']
+                form['mode'] = conn_alive['pwr'][0]['devGM']
+                form['version'] = conn_alive['pwr'][0]['ver']
+                form['type'] = conn_alive['pwr'][0]['cate']
             except IndexError:
                 return to_err()
             except Exception as e:
                 print(e)
                 return to_err()
-        form['mode'] = res['devGM']
-        form['version'] = res['ver']
-        form['type'] = res['cate']
         try:
             return manager.redirect()
         except Exception as e:
             print(e)
             return to_err()
     except ValueError:
+        return to_err()
+    except Exception as e:
+        print(e)
         return to_err()
 
 
@@ -72,6 +78,9 @@ def man():
         manager = ManPage(lcl_form["mode"], lcl_form["id"], lcl_form["type"], lcl_form["version"])
     except NameError:
         return to_err()
+    except Exception as e:
+        print(e)
+        return to_err()
 
     manager.connect(lcl_form["port"])
 
@@ -81,6 +90,9 @@ def man():
         try:
             return manager.show_page
         except ValueError:
+            return to_err()
+        except Exception as e:
+            print(e)
             return to_err()
 
     manager.alter_tunnl_status()

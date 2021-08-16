@@ -224,6 +224,8 @@ class CodeParser:
                 "%02x" % int(self.id),
                 sumCheck(self.id, "84", "00", ["00"] * 5)
             )
+        except Exception as e:
+            print(e)
 
     def pw_encode_84(self, *bid):
         try:
@@ -236,6 +238,8 @@ class CodeParser:
                 "%02x" % int(self.id),
                 sumCheck(self.id, "84", "00", ["00"] * 4)
             )
+        except Exception as e:
+            print(e)
 
     def decode_84(self, code: str):
         return self.decode_41(code)

@@ -34,6 +34,8 @@
                     8通道
                 {% elif mode | lower == 'e3' %}
                     16通道
+                {% elif mode | lower == 'e4' %}
+                    32通道
                 {% endif %}
             </a>
             <div class="row">
@@ -188,7 +190,7 @@
                                 <option value="E1">4通道</option>
                                 <option value="E2">8通道</option>
                                 <option value="E3">16通道</option>
-                                {% if self.cate | lower == 'f2' %}
+                                {% if cate | lower == 'f2' %}
                                     <option value="E4">32通道</option>
                                 {% endif %}
                             </select>
@@ -221,10 +223,10 @@
             <h6>信号继电器板卡：</h6>
             <ul class="list-group">
                 {% for i in range(active_sgn | length) %}
-                    {% if active_sgn[i] == bid | int %}
-                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_sgn[i] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i] }}</button>
+                    {% if active_sgn[i]['id'] == bid | int %}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
                     {% else %}
-                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_sgn[i] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i] }}</button>
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -234,10 +236,10 @@
             <h6>功率继电器板卡：</h6>
             <ul class="list-group">
                 {% for i in range(active_pwr | length) %}
-                    {% if active_pwr[i] == bid | int %}
-                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_pwr[i] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i] }}</button>
+                    {% if active_pwr[i]['id'] == bid | int %}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
                     {% else %}
-                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_pwr[i] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i] }}</button>
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
                     {% endif %}
                 {% endfor %}
             </ul>

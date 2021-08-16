@@ -41,6 +41,12 @@ class ConfigManager(Subpage):
         self.url = "/"
         self.template = 'config.html'
 
+    def check_conn_alive(self):
+        if self.port_man.ser.isOpen():
+            return True
+        else:
+            return False
+
     def connect(self, port):
         self.port_man.set_port(port)
         self.port_man.create_connection(self.port_man.get_port())
@@ -54,24 +60,6 @@ class ConfigManager(Subpage):
     def get_all_ports(self):
         return self.port_man.list_ports()
 
-    def consult_metadata(self, *bid):
-        if not bid:
-            self.port_man.send_data(self.coder.encode_83())
-            return self.coder.decode_83(self.port_man.read_data())
-        else:
-            self.coder.id = bid[0]
-            self.port_man.send_data(self.coder.encode_84())
-            return self.coder.decode_84(self.port_man.read_data())
-
-    def pw_consult_metadata(self, *bid):
-        if not bid:
-            self.port_man.send_data(self.coder.pw_encode_83())
-            return self.coder.pw_decode_83(self.port_man.read_data())
-        else:
-            self.coder.id = bid[0]
-            self.port_man.send_data(self.coder.pw_encode_84())
-            return self.coder.pw_decode_84(self.port_man.read_data())
-
     def get_form(self):
         port = request.form.get("port-select")
         return {'port': port}
@@ -83,11 +71,13 @@ class ConfigManager(Subpage):
         res = {'pwr': [], 'sgn': []}
         for i in range(int(lower), int(upper) + 1):
             if self.port_man.send_data(self.coder.encode_84(i)):
-                if self.port_man.read_data():
-                    res['sgn'].append(i)
+                ipt = self.port_man.read_data()
+                if ipt:
+                    res['sgn'].append(self.coder.decode_84(ipt))
             if self.port_man.send_data(self.coder.pw_encode_84(i)):
-                if self.port_man.read_data():
-                    res['pwr'].append(i)
+                ipt = self.port_man.read_data()
+                if ipt:
+                    res['pwr'].append(self.coder.decode_84(ipt))
         return res
 
 
