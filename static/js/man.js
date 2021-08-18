@@ -52,8 +52,9 @@ function SubmitForm(fid){
     document.getElementById(fid).submit()
 }
 
-function ChangeBoardSubmit(tid){
+function ChangeBoardSubmit(tid, tar_type){
     document.getElementById('change_board_input').value = tid
+    document.getElementById('target_board_type').value = tar_type
     document.getElementById('change-board-form').submit()
 }
 

@@ -23,21 +23,21 @@
             <span class="visually-hidden">Loading...</span>
         </div>
     </div>
-    <div class="container-fluid text-center bg-dark bg-gradient text-white" style="height: 100%">
+    <div class="container-fluid text-center bg-dark bg-gradient text-white overflow-scroll" style="height: 100%">
         <div class="row justify-content-center">
             <div class="col-4 mt-5 p-3 bg-secondary bg-gradient rounded-3 text-start">
                 使用说明：
+
                 <br>
 
                 <br>
-                - 在'串口选择'选择框选中要连接的串口，并选择待连接板卡的'板卡ID', 然后点击'连接'。
+
+                - 在'串口选择'选择框选中要连接的串口，然后点击'连接'。
+
                 <br>
 
                 <br>
-                - 单块板卡调试时可将板卡ID留空，系统会自动识别板卡ID，组模式等参数。
-                <br>
 
-                <br>
                 - 如'串口选择'列表中没有要连接的串口，则点击'刷新此页'后再试。
             </div>
         </div>
@@ -80,7 +80,7 @@
                             <span style="color: red">*</span>
                             扫描范围上界
                         </span>
-                        <input type="text" class="form-control bg-secondary text-white" placeholder="默认值为100..." value="100" id="scan-upr-bounds" name="scan-upr-bounds">
+                        <input type="text" class="form-control bg-secondary text-white" placeholder="默认值为10..." value="10" id="scan-upr-bounds" name="scan-upr-bounds">
                         <div class="valid-feedback">这个看起来没什么问题:)</div>
                         <div class="invalid-feedback">这项必须填写哦>_<</div>
                     </div>

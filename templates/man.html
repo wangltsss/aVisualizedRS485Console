@@ -44,6 +44,7 @@
                         <button class="btn btn-sm btn-outline-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#board-change-offcanvas">切换板卡</button>
                         <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#edit-group-mode-page">编辑组模式</button>
                         <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#edit-board-id-page">编辑板卡ID</button>
+                        <button type="button" class="btn btn-sm btn-outline-light" onclick="document.getElementById('disconnect-all-flag').value=1; document.getElementById('disconnect-all-form').submit()">断开所有通道</button>
                     </div>
                 </div>
             </div>
@@ -137,6 +138,9 @@
             </div>
         {% endfor %}
     {% endif %}
+        <form id="disconnect-all-form" method="post">
+            <input class="form-control" type="hidden" id="disconnect-all-flag" name="disconnect-all-flag" value="0">
+        </form>
     </div>
     <div class="modal fade" id="edit-board-id-page" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
@@ -223,10 +227,10 @@
             <h6>信号继电器板卡：</h6>
             <ul class="list-group">
                 {% for i in range(active_sgn | length) %}
-                    {% if active_sgn[i]['id'] == bid | int %}
-                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
+                    {% if active_sgn[i]['id'] == bid and cate | lower == 'f2'%}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}', 'f2'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
                     {% else %}
-                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_sgn[i]['id'] }}', 'f2'); setDisplay(); setCanvas()">信号继电器板{{ active_sgn[i]['id'] }}</button>
                     {% endif %}
                 {% endfor %}
             </ul>
@@ -236,15 +240,16 @@
             <h6>功率继电器板卡：</h6>
             <ul class="list-group">
                 {% for i in range(active_pwr | length) %}
-                    {% if active_pwr[i]['id'] == bid | int %}
-                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
+                    {% if active_pwr[i]['id'] == bid and cate | lower == 'f1' %}
+                        <button type="button" class="list-group-item list-group-item-action active" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}', 'f1'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
                     {% else %}
-                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
+                        <button type="button" class="list-group-item list-group-item-action" onclick="ChangeBoardSubmit('{{ active_pwr[i]['id'] }}', 'f1'); setDisplay(); setCanvas()">功率继电器板{{ active_pwr[i]['id'] }}</button>
                     {% endif %}
                 {% endfor %}
             </ul>
             <form method="post" id="change-board-form">
                 <input type="hidden" class="form-control" id="change_board_input" name="change-board-input">
+                <input type="hidden" class="form-control" id="target_board_type" name="target-board-type">
             </form>
         </div>
     </div>

@@ -88,7 +88,7 @@ def man():
 
     if request.method == "GET":
         try:
-            return manager.show_page
+            return manager.show_page()
         except ValueError:
             return to_err()
         except Exception as e:

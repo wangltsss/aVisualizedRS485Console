@@ -401,7 +401,17 @@ class CodeParser:
                 counter += 1
         return {"id": id, "devGM": devGM, "tunnl_status": res}
 
+    def disconnect_all(self):
+        return "58 54 {} 82 00 00 00 00 00 00 {}".format(
+            "%02x" % int(self.id),
+            sumCheck(self.id, "82", "00", ["00"] * 5)
+        )
 
+    def pw_disconnect_all(self):
+        return "58 54 {} 82 00 00 00 00 00 {}".format(
+            "%02x" % int(self.id),
+            sumCheck(self.id, "82", "00", ["00"] * 4)
+        )
 
 
 
