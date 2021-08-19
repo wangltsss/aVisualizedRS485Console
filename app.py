@@ -4,6 +4,8 @@ from Util.subpages import ConfigManager, ErrManager, ManPage, TimeOutManager, to
 
 from functools import wraps
 
+from datetime import datetime
+
 app = Flask(__name__)
 
 
@@ -38,7 +40,12 @@ def board():
     manager.connect(form['port'])
     while not manager.check_conn_alive():
         manager.connect(form['port'])
-    conn_alive = manager.test_alive(request.form.get('scan-lwr-bounds'), request.form.get('scan-upr-bounds'))
+    tic = datetime.now()
+    lwr_bounds = request.form.get('scan-lwr-bounds')
+    upr_bounds = request.form.get('scan-upr-bounds')
+    conn_alive = manager.test_alive(lwr_bounds, upr_bounds)
+    toc = datetime.now()
+    print("扫描{}个ID共花费了{}秒。".format(int(upr_bounds)-int(lwr_bounds)+1, (toc-tic).total_seconds()))
     try:
         try:
             form['id'] = conn_alive['sgn'][0]['id']

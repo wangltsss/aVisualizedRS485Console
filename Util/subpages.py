@@ -70,15 +70,15 @@ class ConfigManager(Subpage):
     def test_alive(self, lower, upper):
         res = {'pwr': [], 'sgn': []}
         for i in range(int(lower), int(upper) + 1):
-            if self.port_man.send_data(self.coder.encode_84(i)):
+            self.port_man.send_data(self.coder.encode_84(i))
+            ipt = self.port_man.read_data()
+            j = 0
+            while not ipt and j < 5:
+                j += 1
+                self.port_man.send_data(self.coder.encode_84(i))
                 ipt = self.port_man.read_data()
-                if ipt:
-                    res['sgn'].append(self.coder.decode_84(ipt))
-                else:
-                    self.port_man.send_data(self.coder.encode_84(i))
-                    ipt = self.port_man.read_data()
-                    if ipt:
-                        res['sgn'].append(self.coder.decode_84(ipt))
+            if ipt:
+                res['sgn'].append(self.coder.decode_84(ipt))
             if self.port_man.send_data(self.coder.pw_encode_84(i)):
                 ipt = self.port_man.read_data()
                 if ipt:
@@ -170,7 +170,6 @@ class ManPage(Subpage):
             a = self.status
         except AttributeError:
             self.update_status()
-        print(self.status)
         self.port_man.close(self.port_man.ser)
         return render_template(self.template,
                                nums=self.status,
@@ -309,21 +308,19 @@ class ManPage(Subpage):
         self.id = tid
         self.coder.id = tid
         if tar_type.lower() == 'f2':
-            if self.port_man.send_data(self.coder.encode_84()):
+            self.port_man.send_data(self.coder.encode_84())
+            ipt = self.port_man.read_data()
+            i = 0
+            while not ipt and i < 5:
+                i += 1
+                self.port_man.send_data(self.coder.encode_84())
                 ipt = self.port_man.read_data()
-                if ipt:
-                    res = self.coder.decode_84(ipt)
-                    self.mode = res['devGM']
-                    self.version = res['ver']
-                    self.cate = res['cate']
-                    return True
-                else:
-                    self.port_man.send_data(self.coder.encode_84())
-                    res = self.coder.decode_84(self.port_man.read_data())
-                    self.mode = res['devGM']
-                    self.version = res['ver']
-                    self.cate = res['cate']
-                    return True
+            if ipt:
+                res = self.coder.decode_84(ipt)
+                self.mode = res['devGM']
+                self.version = res['ver']
+                self.cate = res['cate']
+                return True
             else:
                 return False
         elif tar_type == 'f1':
